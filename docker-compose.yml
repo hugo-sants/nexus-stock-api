@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: nexus_db
+      POSTGRES_USER: super
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      -  postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./nexus-stock-api
+    container_name: nexus_backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/nexus_db
+      SPRING_DATASOURCE_USERNAME: super
+      SPRING_DATASOURCE_PASSWORD: admin
+      JWT_SECRET: KEYALEATORY1
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
