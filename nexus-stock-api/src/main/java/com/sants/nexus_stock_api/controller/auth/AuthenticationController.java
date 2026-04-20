@@ -1,4 +1,4 @@
-package com.sants.nexus_stock_api.controllers;
+package com.sants.nexus_stock_api.controller.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,17 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sants.nexus_stock_api.domain.user.User;
-import com.sants.nexus_stock_api.dto.authentication.AuthenticationDTO;
-import com.sants.nexus_stock_api.dto.login.LoginResponseDTO;
-import com.sants.nexus_stock_api.dto.register.RegisterDTO;
-import com.sants.nexus_stock_api.repositories.UserRepository;
+import com.sants.nexus_stock_api.dto.auth.AuthenticationDTO;
+import com.sants.nexus_stock_api.dto.auth.LoginResponseDTO;
+import com.sants.nexus_stock_api.dto.auth.RegisterDTO;
+import com.sants.nexus_stock_api.repositories.user.UserRepository;
 import com.sants.nexus_stock_api.security.TokenService;
 
 import jakarta.validation.Valid;
 
 
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/auth")
 public class AuthenticationController {
     
     @Autowired
@@ -34,7 +34,7 @@ public class AuthenticationController {
     @Autowired
     private TokenService tokenService;
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO dto) {
         
         UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(dto.email(), dto.password());
@@ -45,16 +45,22 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity registe(@RequestBody RegisterDTO dto) {
+    public ResponseEntity register(@RequestBody RegisterDTO dto) {
         ResponseEntity responseEntity;
 
         if (this.repository.findByEmail(dto.email()) != null) {
             responseEntity = ResponseEntity.badRequest().build();
-        }
-        else {
+        } else {
             String encryptedPassword = new BCryptPasswordEncoder().encode(dto.password());
-            User newUser = new User(dto.role(), dto.email(), encryptedPassword);
-            
+
+            User newUser = new User();
+            newUser.setEmail(dto.email());
+            newUser.setPassword(encryptedPassword);
+            newUser.setRole(dto.role());
+            newUser.setName(dto.name());
+            newUser.setCpf(dto.cpf());
+            newUser.setActive(true);
+
             this.repository.save(newUser);
 
             responseEntity = ResponseEntity.ok().build();
@@ -62,6 +68,5 @@ public class AuthenticationController {
 
         return responseEntity;
     }
-    
-    
+
 }

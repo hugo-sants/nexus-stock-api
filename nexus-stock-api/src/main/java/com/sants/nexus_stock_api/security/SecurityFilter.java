@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.sants.nexus_stock_api.repositories.UserRepository;
+import com.sants.nexus_stock_api.repositories.user.UserRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,7 +47,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (authHeader == null) {
             result = null;
         } else {
-            result = authHeader.replace("Bearear ", "");
+            result = authHeader.replace("Bearer ", "");
         }
 
         return result;
